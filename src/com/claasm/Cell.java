@@ -5,6 +5,9 @@ package com.claasm;
  */
 public abstract class Cell {
     private boolean flagged;
+    public static final String CHARACTER_COVERED = " ";
+    public static final String CHARACTER_FLAGGED = "X";
+
 
     public boolean isFlagged() {
         return flagged;

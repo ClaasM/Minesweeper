@@ -100,11 +100,24 @@ public class Board {
     /**
      * Used to check whether the game is won
      *
-     * @return true if there are no more empty cells uncovered
+     * @return true if there are no more empty cells covered
      */
     public boolean isCleared() {
-        //TODO
-        return false;
+        //For each row on the board..
+        for (Cell[] row : cells) {
+            //For each cell...
+            for (Cell cell : row) {
+                if (cell.getClass() == EmptyCell.class) {
+                    EmptyCell emptyCell = (EmptyCell) cell;
+                    if (!emptyCell.isUncovered()) {
+                        //If it's an empty cell and not yet uncovered, the field is not cleared yet
+                        return false;
+                    }
+                }
+            }
+        }
+        //No covered cells -> game is won
+        return true;
     }
 
     /**
@@ -114,12 +127,42 @@ public class Board {
      */
     @Override
     public String toString() {
-        //TODO
-        return null;
+        StringBuilder boardStringBuilder = new StringBuilder();
+        //For each row on the board, starting with the upper one
+        for (int y = getHeight(); y >= 0; y--) {
+            //For each cell...
+            for (int x = 0; x < getWidth(); x++) {
+                Cell cell = cells[x][y];
+
+                //Choose the appropriate character
+                if (cell.isFlagged()) {
+                    //It's a flagged cell
+                    boardStringBuilder.append(Cell.CHARACTER_FLAGGED);
+                } else {
+                    if (cell.getClass() == EmptyCell.class && ((EmptyCell) cell).isUncovered()) {
+                        //It is an exposed cell, potentially with adjacent bombs
+                        int adjacentBombs = countAdjacentBombs(x, y);
+                        boardStringBuilder.append(adjacentBombs == 0 ? EmptyCell.CHARACTER_UNCOVERED : adjacentBombs);
+                    } else {
+                        //It is just a regular old cell
+                        boardStringBuilder.append(EmptyCell.CHARACTER_COVERED);
+                    }
+                }
+                //To keep it a bit tidier in environments with potentially non-monospace console fonts
+                boardStringBuilder.append("\t");
+            }
+            boardStringBuilder.append("\n");
+        }
+        //One last newline so the next instruction is never accidentally printed behind the field
+        boardStringBuilder.append("\n");
+        return boardStringBuilder.toString();
     }
 
     //This helper enum is used to store and iterate through all adjacency relations of a cell
+    //It is used in the forEach of adjacent cells
+    @SuppressWarnings("unused")
     enum adjacency {
+
         TOP(0, 1),
         RIGHT(1, 0),
         BOTTOM(-1, 0),
