@@ -29,8 +29,31 @@ public class Board {
      * @return true if it was a bomb (the game needs to stopped)
      */
     public boolean click(int x, int y) {
+        Cell cell = cells[x][y];
+
+        if (cell.isFlagged()) {
+            //If the cell is flagged, it is not uncovered but the flag is removed.
+            toggleFlag(x, y);
+            return false;
+        }
+
+        if (cell.getClass() == EmptyCell.class) {
+            //The cell is not a bomb
+            EmptyCell emptyCell = (EmptyCell) cell;
+            if (!emptyCell.isUncovered()) {
+                //Clear the cell and all adjacent cells
+                clearAdjacentCells(x, y);
+            }
+            // else: the cell has already been uncovered, nothing is done
+            return false;
+        } else {
+            //The cell is a bomb, the game is over
+            return true;
+        }
+    }
+
+    private void clearAdjacentCells(int x, int y) {
         //TODO
-        return false;
     }
 
     /**
@@ -41,11 +64,13 @@ public class Board {
      * @return false if it was a bomb (the game needs to stopped)
      */
     public void toggleFlag(int x, int y) {
-        //TODO
+        Cell cell = cells[x][y];
+        cell.setFlagged(!cell.isFlagged());
     }
 
     /**
      * Used to check whether the game is won
+     *
      * @return true if there are no more empty cells uncovered
      */
     public boolean isCleared() {
@@ -55,6 +80,7 @@ public class Board {
 
     /**
      * Used to print the board to the console so the user can see the state of the game
+     *
      * @return the board, represented as a human-readable character-grid
      */
     @Override
