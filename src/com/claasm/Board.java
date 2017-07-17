@@ -6,7 +6,7 @@ package com.claasm;
 public class Board {
 
     //The percentage of cells that will be populated with bombs
-    private static final float BOMBS_PERCENTAGE = 25.0f;
+    private static final float BOMBS_PERCENTAGE = 10.0f;
     //The coordinate system starts on the bottom left
     Cell[][] cells;
 
@@ -22,7 +22,6 @@ public class Board {
                 }
             }
         }
-        //TODO populate
     }
 
     public int getWidth() {
@@ -141,7 +140,7 @@ public class Board {
     public String toString() {
         StringBuilder boardStringBuilder = new StringBuilder();
         //For each row on the board, starting with the upper one
-        for (int y = getHeight(); y >= 0; y--) {
+        for (int y = getHeight() - 1; y >= 0; y--) {
             //For each cell...
             for (int x = 0; x < getWidth(); x++) {
                 Cell cell = cells[x][y];
@@ -177,7 +176,7 @@ public class Board {
 
         TOP(0, 1),
         RIGHT(1, 0),
-        BOTTOM(-1, 0),
+        BOTTOM(0, -1),
         LEFT(-1, 0),
 
         TOP_RIGHT(1, 1),

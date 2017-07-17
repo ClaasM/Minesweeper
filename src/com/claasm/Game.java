@@ -13,20 +13,21 @@ public class Game {
     Board board;
 
     public Game() {
-        this.board = new Board(10,10);
+        this.board = new Board(7,7);
         this.sc = new Scanner(System.in);
     }
 
     public void start(){
         boolean isRunning = true;
         while(isRunning){
-
+            //Start each turn by showing the user the playing field.
+            System.out.println(board);
             //Get the input for the next turn from the user
             System.out.println("Which action? c for click, f for flag");
-            String action = sc.nextLine(); //Flag or click
+            String action = sc.next(); //Flag or click
             System.out.println("Which column?");
             int x = sc.nextInt(board.getWidth()); //x position of the selected cell
-            System.out.println("Which row");
+            System.out.println("Which row?");
             int y = sc.nextInt(board.getHeight()); //y position of the selected cell
 
             //Perform the appropriate action
@@ -36,7 +37,7 @@ public class Game {
                 boolean won = board.isCleared();
                 if(wasBomb){
                     //The user selected a bomb, end the game
-                    System.out.println("Game Over!");
+                    System.out.println("You hit a bomb, Game Over!");
                     isRunning = false;
                 } else if (won){
                     //The user cleared all empty cells
