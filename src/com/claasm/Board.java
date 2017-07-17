@@ -1,11 +1,11 @@
 package com.claasm;
 
-import java.util.Arrays;
-
 /**
  * Created by claasmeiners on 17/07/17.
  */
 public class Board {
+
+    //The coordinate system starts on the bottom left
     Cell[][] cells;
 
     public Board(int width, int height) {
@@ -42,7 +42,7 @@ public class Board {
             EmptyCell emptyCell = (EmptyCell) cell;
             if (!emptyCell.isUncovered()) {
                 //Clear the cell and all adjacent cells
-                clearAdjacentCells(x, y);
+                exposeFrom(x, y);
             }
             // else: the cell has already been uncovered, nothing is done
             return false;
@@ -52,9 +52,38 @@ public class Board {
         }
     }
 
-    private void clearAdjacentCells(int x, int y) {
-        //TODO
+
+    private void exposeFrom(int x, int y) {
+        //Expose this cell and all adjacent cells that have no number
+        EmptyCell emptyCell = (EmptyCell) cells[x][y]; //We just assume at this point that the cell is an Emptycell
+        emptyCell.setUncovered(true);
+
+
+        if (countAdjacentBombs(x, y) == 0) {
+
+            //There are no adjacent bombs -> Recurse on all adjacent empty cells that are not yet uncovered
+            forEachAdjacentCell(x, y, (adjacentX, adjacentY) -> {
+                if (cells[adjacentX][adjacentY].getClass() == EmptyCell.class) {
+                    EmptyCell adjacentEmptyCell = (EmptyCell) cells[adjacentX][adjacentY];
+                    if (!adjacentEmptyCell.isUncovered()) {
+                        exposeFrom(adjacentX, adjacentY);
+                    }
+                }
+            });
+        }
     }
+
+    private int countAdjacentBombs(int x, int y) {
+        //Sadly we have to do a bit of trickery here
+        final int[] count = {0};
+        forEachAdjacentCell(x, y, (adjacentX, adjacentY) -> {
+            if (cells[adjacentX][adjacentY].getClass() == MineCell.class) {
+                count[0]++;
+            }
+        });
+        return count[0];
+    }
+
 
     /**
      * Simulates the right-click of the user on a cell, toggling the flag on the cell.
@@ -88,4 +117,59 @@ public class Board {
         //TODO
         return null;
     }
+
+    //This helper enum is used to store and iterate through all adjacency relations of a cell
+    enum adjacency {
+        TOP(0, 1),
+        RIGHT(1, 0),
+        BOTTOM(-1, 0),
+        LEFT(-1, 0),
+
+        TOP_RIGHT(1, 1),
+        BOTTOM_RIGHT(1, -1),
+        BOTTOM_LEFT(-1, -1),
+        TOP_LEFT(-1, 1);
+
+        int xDiff;
+        int yDiff;
+
+        adjacency(int xDiff, int yDiff) {
+            this.xDiff = xDiff;
+            this.yDiff = yDiff;
+        }
+    }
+
+    //This interface is used to be able to perform forEach with lamba expressions with 2 parameters
+    @FunctionalInterface
+    interface Function<X, Y> {
+        void apply(X x, Y y);
+    }
+
+    /**
+     * Applies a function that takes two int's as an arguments to all adjacent cells of the cell at x,y that are within bounds
+     *
+     * @param x        the x-location of the cell
+     * @param y        the y-location of the cell
+     * @param function can assume the cell is within bounds
+     */
+    private void forEachAdjacentCell(int x, int y, Function<Integer, Integer> function) {
+        //For convenience & performance:
+        int width = getWidth();
+        int height = getHeight();
+
+        //For each adjacency relation
+        for (adjacency a : adjacency.values()) {
+            //Get the coordinates of the adjacent cell
+            int adjacentX = x + a.xDiff;
+            int adjacentY = y + a.yDiff;
+
+            //Check if the cell is still within bounds
+            if (adjacentX < height && adjacentX >= 0 && adjacentY < width && adjacentY >= 0) {
+                //If so, apply the function
+                function.apply(adjacentX, adjacentY);
+            }
+        }
+    }
+
+
 }

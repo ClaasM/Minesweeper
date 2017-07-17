@@ -9,4 +9,8 @@ public class EmptyCell extends Cell {
     public boolean isUncovered() {
         return uncovered;
     }
+
+    public void setUncovered(boolean uncovered) {
+        this.uncovered = uncovered;
+    }
 }
