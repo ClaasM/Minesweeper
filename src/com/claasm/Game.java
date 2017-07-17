@@ -4,6 +4,7 @@ import java.util.Scanner;
 
 /**
  * Created by claasmeiners on 17/07/17.
+ * This class manages the input from the user and the output from the game in a simple game loop
  */
 public class Game {
     //Used to read the user input
@@ -12,11 +13,17 @@ public class Game {
     //The board holds all the pieces
     Board board;
 
+    /**
+     * Creates a game.
+     */
     public Game() {
         this.board = new Board(7,7);
         this.sc = new Scanner(System.in);
     }
 
+    /**
+     * Starts the game.
+     */
     public void start(){
         boolean isRunning = true;
         while(isRunning){

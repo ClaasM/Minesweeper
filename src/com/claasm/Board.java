@@ -2,20 +2,26 @@ package com.claasm;
 
 /**
  * Created by claasmeiners on 17/07/17.
+ * This contains the main logic and rules of the game.
  */
 public class Board {
 
     //The percentage of cells that will be populated with bombs
-    private static final float BOMBS_PERCENTAGE = 10.0f;
+    private static final float MINES_PERCENTAGE = 10.0f;
     //The coordinate system starts on the bottom left
     Cell[][] cells;
 
-
+    /**
+     * Creates a playing board and initializes all the cells either as empty cells or mine cells, with the percentage of mine cells given by MINES_PERCENTAGE
+     *
+     * @param width  the width of the board
+     * @param height the height of the board
+     */
     public Board(int width, int height) {
         this.cells = new Cell[width][height];
         for (int y = 0; y < width; y++) {
             for (int x = 0; x < height; x++) {
-                if (Math.random() < (BOMBS_PERCENTAGE / 100f)) {
+                if (Math.random() < (MINES_PERCENTAGE / 100f)) {
                     cells[x][y] = new MineCell();
                 } else {
                     cells[x][y] = new EmptyCell();
@@ -24,10 +30,16 @@ public class Board {
         }
     }
 
+    /**
+     * @return the width of the board
+     */
     public int getWidth() {
         return cells.length;
     }
 
+    /**
+     * @return the height of the board
+     */
     public int getHeight() {
         return cells.length > 0 ? cells[0].length : 0;
     }
@@ -63,7 +75,11 @@ public class Board {
         }
     }
 
-
+    /**
+     * Starts with the given cell and, if the cell has no adjacent mines, calls itself recursively with all adjacent cells, according to Minesweeper rules.
+     * @param x the x coordinate of the cell
+     * @param y the y coordinate of the cell
+     */
     private void exposeFrom(int x, int y) {
         //Expose this cell and all adjacent cells that have no number
         EmptyCell emptyCell = (EmptyCell) cells[x][y]; //We just assume at this point that the cell is an Emptycell
@@ -84,6 +100,12 @@ public class Board {
         }
     }
 
+    /**
+     * Checks each adjacent cell, excluding the x,y-cell, for being a mine and keeps count
+     * @param x the x coordinate of the cell
+     * @param y the y coordinate of the cell
+     * @return the number of mines in the 3 to 8 adjacent cells
+     */
     private int countAdjacentBombs(int x, int y) {
         //Sadly we have to do a bit of trickery here
         final int[] count = {0};
@@ -103,7 +125,7 @@ public class Board {
      * @param y the y-location of the cell
      * @return false if it was a bomb (the game needs to stopped)
      */
-    public void toggleFlag(int x, int y) {
+    void toggleFlag(int x, int y) {
         Cell cell = cells[x][y];
         cell.setFlagged(!cell.isFlagged());
     }
@@ -113,7 +135,7 @@ public class Board {
      *
      * @return true if there are no more empty cells which are not exposed
      */
-    public boolean isCleared() {
+    boolean isCleared() {
         //For each row on the board..
         for (Cell[] row : cells) {
             //For each cell...
@@ -171,6 +193,7 @@ public class Board {
 
     //This helper enum is used to store and iterate through all adjacency relations of a cell
     //It is used in the forEach of adjacent cells
+    //It defines what we understand as being "adjacent"
     @SuppressWarnings("unused")
     enum adjacency {
 
@@ -224,6 +247,4 @@ public class Board {
             }
         }
     }
-
-
 }
