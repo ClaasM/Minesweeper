@@ -5,11 +5,23 @@ package com.claasm;
  */
 public class Board {
 
+    //The percentage of cells that will be populated with bombs
+    private static final float BOMBS_PERCENTAGE = 25.0f;
     //The coordinate system starts on the bottom left
     Cell[][] cells;
 
+
     public Board(int width, int height) {
         this.cells = new Cell[width][height];
+        for (int y = 0; y < width; y++) {
+            for (int x = 0; x < height; x++) {
+                if (Math.random() < (BOMBS_PERCENTAGE / 100f)) {
+                    cells[x][y] = new MineCell();
+                } else {
+                    cells[x][y] = new EmptyCell();
+                }
+            }
+        }
         //TODO populate
     }
 
