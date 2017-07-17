@@ -20,7 +20,7 @@ public class Game {
     public void start(){
         boolean isRunning = true;
         while(isRunning){
-            //Start each turn by showing the user the playing field.
+            //Start each turn by showing the user the current state of the board.
             System.out.println(board);
             //Get the input for the next turn from the user
             System.out.println("Which action? c for click, f for flag");
@@ -40,7 +40,7 @@ public class Game {
                     System.out.println("You hit a bomb, Game Over!");
                     isRunning = false;
                 } else if (won){
-                    //The user cleared all empty cells
+                    //The user exposed all empty cells
                     System.out.println("You won!");
                     isRunning = false;
                 } //else continue

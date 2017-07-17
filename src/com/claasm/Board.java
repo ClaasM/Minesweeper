@@ -43,7 +43,7 @@ public class Board {
         Cell cell = cells[x][y];
 
         if (cell.isFlagged()) {
-            //If the cell is flagged, it is not uncovered but the flag is removed.
+            //If the cell is flagged, it is not exposed but the flag is removed.
             toggleFlag(x, y);
             return false;
         }
@@ -51,11 +51,11 @@ public class Board {
         if (cell.getClass() == EmptyCell.class) {
             //The cell is not a bomb
             EmptyCell emptyCell = (EmptyCell) cell;
-            if (!emptyCell.isUncovered()) {
-                //Clear the cell and all adjacent cells
+            if (!emptyCell.isExposed()) {
+                //Expose the cell and all adjacent cells
                 exposeFrom(x, y);
             }
-            // else: the cell has already been uncovered, nothing is done
+            // else: the cell has already been exposed, nothing is done
             return false;
         } else {
             //The cell is a bomb, the game is over
@@ -67,16 +67,16 @@ public class Board {
     private void exposeFrom(int x, int y) {
         //Expose this cell and all adjacent cells that have no number
         EmptyCell emptyCell = (EmptyCell) cells[x][y]; //We just assume at this point that the cell is an Emptycell
-        emptyCell.setUncovered(true);
+        emptyCell.setExposed(true);
 
 
         if (countAdjacentBombs(x, y) == 0) {
 
-            //There are no adjacent bombs -> Recurse on all adjacent empty cells that are not yet uncovered
+            //There are no adjacent bombs -> Recurse on all adjacent empty cells that are not yet exposed
             forEachAdjacentCell(x, y, (adjacentX, adjacentY) -> {
                 if (cells[adjacentX][adjacentY].getClass() == EmptyCell.class) {
                     EmptyCell adjacentEmptyCell = (EmptyCell) cells[adjacentX][adjacentY];
-                    if (!adjacentEmptyCell.isUncovered()) {
+                    if (!adjacentEmptyCell.isExposed()) {
                         exposeFrom(adjacentX, adjacentY);
                     }
                 }
@@ -111,7 +111,7 @@ public class Board {
     /**
      * Used to check whether the game is won
      *
-     * @return true if there are no more empty cells covered
+     * @return true if there are no more empty cells which are not exposed
      */
     public boolean isCleared() {
         //For each row on the board..
@@ -120,8 +120,8 @@ public class Board {
             for (Cell cell : row) {
                 if (cell.getClass() == EmptyCell.class) {
                     EmptyCell emptyCell = (EmptyCell) cell;
-                    if (!emptyCell.isUncovered()) {
-                        //If it's an empty cell and not yet uncovered, the field is not cleared yet
+                    if (!emptyCell.isExposed()) {
+                        //If it's an empty cell and not yet exposed, the board is not cleared yet
                         return false;
                     }
                 }
@@ -150,10 +150,10 @@ public class Board {
                     //It's a flagged cell
                     boardStringBuilder.append(Cell.CHARACTER_FLAGGED);
                 } else {
-                    if (cell.getClass() == EmptyCell.class && ((EmptyCell) cell).isUncovered()) {
+                    if (cell.getClass() == EmptyCell.class && ((EmptyCell) cell).isExposed()) {
                         //It is an exposed cell, potentially with adjacent bombs
                         int adjacentBombs = countAdjacentBombs(x, y);
-                        boardStringBuilder.append(adjacentBombs == 0 ? EmptyCell.CHARACTER_UNCOVERED : adjacentBombs);
+                        boardStringBuilder.append(adjacentBombs == 0 ? EmptyCell.CHARACTER_EXPOSED : adjacentBombs);
                     } else {
                         //It is just a regular old cell
                         boardStringBuilder.append(EmptyCell.CHARACTER_COVERED);
@@ -164,7 +164,7 @@ public class Board {
             }
             boardStringBuilder.append("\n");
         }
-        //One last newline so the next instruction is never accidentally printed behind the field
+        //One last newline so the next instruction is never accidentally printed behind the board
         boardStringBuilder.append("\n");
         return boardStringBuilder.toString();
     }

@@ -4,14 +4,14 @@ package com.claasm;
  * Created by claasmeiners on 17/07/17.
  */
 public class EmptyCell extends Cell {
-    public static final String CHARACTER_UNCOVERED = "0";
-    private boolean uncovered;
+    public static final String CHARACTER_EXPOSED = "0";
+    private boolean exposed;
 
-    public boolean isUncovered() {
-        return uncovered;
+    public boolean isExposed() {
+        return exposed;
     }
 
-    public void setUncovered(boolean uncovered) {
-        this.uncovered = uncovered;
+    public void setExposed(boolean exposed) {
+        this.exposed = exposed;
     }
 }
