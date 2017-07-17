@@ -6,17 +6,17 @@ import java.util.Scanner;
  * Created by claasmeiners on 17/07/17.
  * This class manages the input from the user and the output from the game in a simple game loop
  */
-public class Game {
+class Game {
     //Used to read the user input
-    Scanner sc;
+    private Scanner sc;
 
     //The board holds all the pieces
-    Board board;
+    private Board board;
 
     /**
      * Creates a game.
      */
-    public Game() {
+    Game() {
         this.board = new Board(7,7);
         this.sc = new Scanner(System.in);
     }
@@ -24,7 +24,7 @@ public class Game {
     /**
      * Starts the game.
      */
-    public void start(){
+    void start(){
         boolean isRunning = true;
         while(isRunning){
             //Start each turn by showing the user the current state of the board.
@@ -40,11 +40,11 @@ public class Game {
             //Perform the appropriate action
             if("c".equals(action)){
                 //The user left-clicked on a cell
-                boolean wasBomb = board.click(x,y);
+                boolean wasMine = board.click(x,y);
                 boolean won = board.isCleared();
-                if(wasBomb){
-                    //The user selected a bomb, end the game
-                    System.out.println("You hit a bomb, Game Over!");
+                if(wasMine){
+                    //The user selected a mine, end the game
+                    System.out.println("You hit a mine, Game Over!");
                     isRunning = false;
                 } else if (won){
                     //The user exposed all empty cells

@@ -6,10 +6,10 @@ package com.claasm;
  */
 public class Board {
 
-    //The percentage of cells that will be populated with bombs
+    //The percentage of cells that will be populated with mines
     private static final float MINES_PERCENTAGE = 10.0f;
     //The coordinate system starts on the bottom left
-    Cell[][] cells;
+    private Cell[][] cells;
 
     /**
      * Creates a playing board and initializes all the cells either as empty cells or mine cells, with the percentage of mine cells given by MINES_PERCENTAGE
@@ -17,7 +17,7 @@ public class Board {
      * @param width  the width of the board
      * @param height the height of the board
      */
-    public Board(int width, int height) {
+    Board(int width, int height) {
         this.cells = new Cell[width][height];
         for (int y = 0; y < width; y++) {
             for (int x = 0; x < height; x++) {
@@ -33,25 +33,25 @@ public class Board {
     /**
      * @return the width of the board
      */
-    public int getWidth() {
+    int getWidth() {
         return cells.length;
     }
 
     /**
      * @return the height of the board
      */
-    public int getHeight() {
+    int getHeight() {
         return cells.length > 0 ? cells[0].length : 0;
     }
 
     /**
-     * Simulates the left-click of the user on a cell, opening the cell and all neighboring cells according to Minesweeper rules, or ending the game if there was a bomb below.
+     * Simulates the left-click of the user on a cell, opening the cell and all neighboring cells according to Minesweeper rules, or ending the game if there was a mine below.
      *
      * @param x the x-location of the cell
      * @param y the y-location of the cell
-     * @return true if it was a bomb (the game needs to stopped)
+     * @return true if it was a mine (the game needs to stopped)
      */
-    public boolean click(int x, int y) {
+    boolean click(int x, int y) {
         Cell cell = cells[x][y];
 
         if (cell.isFlagged()) {
@@ -61,7 +61,7 @@ public class Board {
         }
 
         if (cell.getClass() == EmptyCell.class) {
-            //The cell is not a bomb
+            //The cell is not a mine
             EmptyCell emptyCell = (EmptyCell) cell;
             if (!emptyCell.isExposed()) {
                 //Expose the cell and all adjacent cells
@@ -70,7 +70,7 @@ public class Board {
             // else: the cell has already been exposed, nothing is done
             return false;
         } else {
-            //The cell is a bomb, the game is over
+            //The cell is a mine, the game is over
             return true;
         }
     }
@@ -83,12 +83,12 @@ public class Board {
     private void exposeFrom(int x, int y) {
         //Expose this cell and all adjacent cells that have no number
         EmptyCell emptyCell = (EmptyCell) cells[x][y]; //We just assume at this point that the cell is an Emptycell
-        emptyCell.setExposed(true);
+        emptyCell.expose();
 
 
-        if (countAdjacentBombs(x, y) == 0) {
+        if (countAdjacentMines(x, y) == 0) {
 
-            //There are no adjacent bombs -> Recurse on all adjacent empty cells that are not yet exposed
+            //There are no adjacent mines -> Recurse on all adjacent empty cells that are not yet exposed
             forEachAdjacentCell(x, y, (adjacentX, adjacentY) -> {
                 if (cells[adjacentX][adjacentY].getClass() == EmptyCell.class) {
                     EmptyCell adjacentEmptyCell = (EmptyCell) cells[adjacentX][adjacentY];
@@ -106,7 +106,7 @@ public class Board {
      * @param y the y coordinate of the cell
      * @return the number of mines in the 3 to 8 adjacent cells
      */
-    private int countAdjacentBombs(int x, int y) {
+    private int countAdjacentMines(int x, int y) {
         //Sadly we have to do a bit of trickery here
         final int[] count = {0};
         forEachAdjacentCell(x, y, (adjacentX, adjacentY) -> {
@@ -123,7 +123,6 @@ public class Board {
      *
      * @param x the x-location of the cell
      * @param y the y-location of the cell
-     * @return false if it was a bomb (the game needs to stopped)
      */
     void toggleFlag(int x, int y) {
         Cell cell = cells[x][y];
@@ -173,9 +172,9 @@ public class Board {
                     boardStringBuilder.append(Cell.CHARACTER_FLAGGED);
                 } else {
                     if (cell.getClass() == EmptyCell.class && ((EmptyCell) cell).isExposed()) {
-                        //It is an exposed cell, potentially with adjacent bombs
-                        int adjacentBombs = countAdjacentBombs(x, y);
-                        boardStringBuilder.append(adjacentBombs == 0 ? EmptyCell.CHARACTER_EXPOSED : adjacentBombs);
+                        //It is an exposed cell, potentially with adjacent mines
+                        int adjacentMines = countAdjacentMines(x, y);
+                        boardStringBuilder.append(adjacentMines == 0 ? EmptyCell.CHARACTER_EXPOSED : adjacentMines);
                     } else {
                         //It is just a regular old cell
                         boardStringBuilder.append(EmptyCell.CHARACTER_COVERED);
